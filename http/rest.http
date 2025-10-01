@@ -1,0 +1,29 @@
+### Get Healthy Check back end
+GET http://127.0.0.1:3030/api/atmo/healthy
+
+# ### Create a new book
+# POST http://localhost/create
+# Content-Type: application/x-www-form-urlencoded
+
+# title=The Hitchhiker's Guide to the Galaxy&author=Douglas Adams&year=1979
+
+# ### Create another book
+# POST http://localhost/create
+# Content-Type: application/x-www-form-urlencoded
+
+# title=1984&author=George Orwell&year=1949
+
+# ### Get a specific book by ID
+# # Replace <BOOK_ID> with an actual book ID from your database (e.g., from the "Get all books" response)
+# GET http://localhost/book/<BOOK_ID>
+
+# ### Edit an existing book
+# # Replace <BOOK_ID> with an actual book ID
+# POST http://localhost/edit/<BOOK_ID>
+# Content-Type: application/x-www-form-urlencoded
+
+# title=The Hitchhiker's Guide to the Galaxy - Revised&author=Douglas Adams&year=1980
+
+# ### Delete a book
+# # Replace <BOOK_ID> with an actual book ID
+# POST http://localhost/delete/<BOOK_ID>
