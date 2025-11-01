@@ -1,0 +1,65 @@
+* {
+    box-sizing: border-box;
+}
+
+::selection {
+    background-color: $clr1;
+    color: $clr6;
+}
+
+html {
+    font-family: montserrat;
+    color: $clr2;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: rem(16px);
+    margin: 0;
+    padding: 0px;
+}
+
+.app {
+    &.rtl {
+        // direction: rtl;
+
+        .filter-by,
+        .direction-sec {
+            direction: rtl;
+
+        }
+    }
+}
+
+main {
+    overflow: hidden;
+}
+
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 0;
+    line-height: 1;
+}
+
+
+img {
+    width: 100%;
+}
+
+p {
+    margin: 0;
+}
+
+a {
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}

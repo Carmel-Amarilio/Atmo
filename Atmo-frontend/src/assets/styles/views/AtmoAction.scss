@@ -1,0 +1,28 @@
+.atmo-action{
+     background: linear-gradient(to bottom,
+            rgba($prime-clr, .1) 0%,
+            rgba($prime-clr, 0) 100%,
+           );
+    height: 100vh;
+    gap: 100px;
+
+
+    .option{
+        .action-card{
+            background-color: white;
+            border-radius: 20px;
+            width: 265px;
+            height: 300px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            img{
+                width: 100px;
+            }
+            p{
+                width: 200px;
+            }
+        }
+    }
+
+}

@@ -1,0 +1,59 @@
+// flex helpers
+
+.flex {
+
+    display: flex;
+
+    >*.full {
+        flex: 1;
+    }
+
+    &.column {
+        flex-direction: column;
+    }
+
+    &.justify-center {
+        justify-content: center;
+    }
+
+    &.align-center {
+        align-items: center;
+    }
+
+    &.justify-end {
+        justify-content: flex-end;
+    }
+
+    &.justify-start {
+        justify-content: flex-start;
+    }
+
+    &.space-between {
+        justify-content: space-between;
+    }
+
+    &.gap5 {
+        gap: 5px;
+    }
+
+    &.gap10 {
+        gap: 10px;
+    }
+
+    &.gap15 {
+        gap: 15px;
+    }
+
+    &.gap20 {
+        gap: 20px;
+    }
+
+    &.gap25 {
+        gap: 25px;
+    }
+
+    &.gap30 {
+        gap: 30px;
+    }
+
+}

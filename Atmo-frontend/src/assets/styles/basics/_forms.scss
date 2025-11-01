@@ -1,0 +1,27 @@
+button {
+    border: 0;
+    background-color: $prime-clr;
+    color: whitesmoke;
+    padding: 10px 20px;
+    margin: 0px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+form>* {
+    display: block;
+    width: 200px;
+    margin: 10px 0px;
+}
+
+.btn-link {
+    border: 0;
+    background-color: transparent;
+    text-decoration: underline;
+    transition: .5s;
+}
+
+.btn-link:hover {
+    background-color: $clr1;
+    transform: scale(1.1);
+}
