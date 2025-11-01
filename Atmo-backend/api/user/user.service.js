@@ -70,8 +70,7 @@ async function update(user) {
         const userToSave = {
             _id: ObjectId(user._id),
             userName: user.userName,
-            fullName: user.fullName,
-            imgUrl: user.imgUrl,
+            fullname: user.fullname,
         }
         const collection = await dbService.getCollection('user')
         await collection.updateOne({ _id: userToSave._id }, { $set: userToSave })
@@ -92,9 +91,8 @@ async function add(user) {
         const userToAdd = {
             userName: user.userName,
             password: user.password,
-            fullName: user.fullName,
-            imgUrl: user.imgUrl,
-            
+            fullname: user.fullname,
+
         }
         const collection = await dbService.getCollection('user')
         await collection.insertOne(userToAdd)
@@ -114,7 +112,7 @@ function _buildCriteria(filterBy) {
                 userName: txtCriteria
             },
             {
-                fullName: txtCriteria
+                fullname: txtCriteria
             }
         ]
     }

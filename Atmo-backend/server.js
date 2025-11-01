@@ -5,7 +5,7 @@ import cors from 'cors'
 
 import { logger } from './services/logger.service.js';
 import { setupSocketAPI } from './services/socket.service.js';
-// import { authRoutes } from './api/auth/auth.routes.js';
+import { authRoutes } from './api/auth/auth.routes.js';
 import { atmoRoutes } from './api/atmo/atmo.routes.js';
 
 
@@ -31,7 +31,7 @@ app.use(express.static('public'))
 
 
 // routes
-// app.use('/api/auth', authRoutes)
+app.use('/api/auth', authRoutes)
 app.use('/api/atmo', atmoRoutes)
 setupSocketAPI(server)
 

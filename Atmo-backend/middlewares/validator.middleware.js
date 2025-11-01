@@ -29,7 +29,7 @@ export const validateOrder = (req, res, next) => {
 const signupSchema = Joi.object({
     userName: Joi.string().min(1).max(20).required(),
     password: Joi.string().min(1).required(),
-    fullName: Joi.string().min(1).max(30).required(),
+    fullname: Joi.string().min(1).max(30).required(),
     imgUrl: Joi.string().allow(null).min(0).max(190)
 });
 
@@ -50,7 +50,7 @@ const staySchema = Joi.object({
     labels: Joi.array().items(Joi.string()),
     host: Joi.object({
         _id: Joi.string().min(2).required(),
-        fullName: Joi.string().min(2).max(20).required(),
+        fullname: Joi.string().min(2).max(20).required(),
         imgUrl: Joi.string().min(10).max(600).optional().allow(null),
     }),
     loc: Joi.object({
@@ -72,12 +72,12 @@ const orderSchema = Joi.object({
     hostId: Joi.string().min(2).required(),
     host: Joi.object({
         _id: Joi.string().min(2).required(),
-        fullName: Joi.string().min(2).max(20).required(),
+        fullname: Joi.string().min(2).max(20).required(),
         imgUrl: Joi.string().min(10).max(600).optional().allow(null),
     }),
     buyer: Joi.object({
         _id: Joi.string().min(2).required(),
-        fullName: Joi.string().min(2).max(20).required(),
+        fullname: Joi.string().min(2).max(20).required(),
         imgUrl: Joi.string().min(10).max(600).optional().allow(null),
     }),
     totalPrice: Joi.number().min(1).optional().allow(null),

@@ -27,3 +27,7 @@ GET http://127.0.0.1:3030/api/atmo/healthy
 # ### Delete a book
 # # Replace <BOOK_ID> with an actual book ID
 # POST http://localhost/delete/<BOOK_ID>
+
+
+# carmelamarilio9_db_user
+# Ntjny0gvm1EXcgAM
