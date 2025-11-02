@@ -89,9 +89,9 @@ async function add(user) {
 
         // peek only updatable fields!
         const userToAdd = {
-            userName: user.userName,
+            cloudPermissions: user.cloudPermissions,
             password: user.password,
-            fullname: user.fullname,
+            userName: user.userName,
 
         }
         const collection = await dbService.getCollection('user')

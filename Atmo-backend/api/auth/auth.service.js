@@ -26,14 +26,14 @@ async function login(userName, password) {
     return user
 }
 
-async function signup(userName, password, fullname) {
+async function signup(userName, password, cloudPermissions) {
     const saltRounds = 10
 
-    logger.debug(`auth.service - signup with userName: ${userName}, fullname: ${fullname}`)
-    if (!userName || !password || !fullname) throw new Error('Missing details')
+    logger.debug(`auth.service - signup with userName: ${userName}, cloudPermissions: `)
+    if (!userName || !password || !cloudPermissions) throw new Error('Missing details')
 
     const hash = await bcrypt.hash(password, saltRounds)
-    return userService.add({ userName, password: hash, fullname })
+    return userService.add({ userName, password: hash, cloudPermissions })
 }
 
 function getLoginToken(user) {

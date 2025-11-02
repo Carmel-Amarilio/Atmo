@@ -24,9 +24,24 @@ export function AppHeader() {
     }
 
     function handleOption(option) {
-        setCloudService(option)
+        if (option.disabled) return
+        setCloudService(option.name)
         setIsMenuOpen(false)
     }
+
+    // יצירת רשימת שירותים לפי ההרשאות
+    const cloudOptions = [
+        { name: 'All', enabled: true },
+        { name: 'AWS', enabled: loggedinUser?.cloudPermissions?.AWS?.EnableEC2Access ||
+            loggedinUser?.cloudPermissions?.AWS?.EnableBillingAccess ||
+            loggedinUser?.cloudPermissions?.AWS?.EnableLoggingAccess },
+        { name: 'Azure', enabled: loggedinUser?.cloudPermissions?.Azure?.EnableEC2Access ||
+            loggedinUser?.cloudPermissions?.Azure?.EnableBillingAccess ||
+            loggedinUser?.cloudPermissions?.Azure?.EnableLoggingAccess },
+        { name: 'GCP', enabled: loggedinUser?.cloudPermissions?.GCP?.EnableEC2Access ||
+            loggedinUser?.cloudPermissions?.GCP?.EnableBillingAccess ||
+            loggedinUser?.cloudPermissions?.GCP?.EnableLoggingAccess }
+    ]
 
     return (
         <header className="app-header flex align-center justify-between">
@@ -46,13 +61,16 @@ export function AppHeader() {
 
                     {isMenuOpen && (
                         <div className="user-menu">
-                            {['All', 'AWS', 'Azure', 'GCP'].map((option) => (
+                            {cloudOptions.map((option) => (
                                 <button
-                                    key={option}
+                                    key={option.name}
                                     onClick={() => handleOption(option)}
-                                    className={cloudService === option ? 'selected' : ''}
+                                    disabled={!option.enabled}
+                                    className={`${cloudService === option.name ? 'selected' : ''} ${
+                                        !option.enabled ? 'disabled' : ''
+                                    }`}
                                 >
-                                    {option}
+                                    {option.name}
                                 </button>
                             ))}
                             <hr />

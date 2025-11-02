@@ -29,9 +29,26 @@ export const validateOrder = (req, res, next) => {
 const signupSchema = Joi.object({
     userName: Joi.string().min(1).max(20).required(),
     password: Joi.string().min(1).required(),
-    fullname: Joi.string().min(1).max(30).required(),
-    imgUrl: Joi.string().allow(null).min(0).max(190)
-});
+    fullname: Joi.string().min(1).max(30),
+    cloudPermissions: Joi.object({
+        AWS: Joi.object({
+            EnableBillingAccess: Joi.boolean().required(),
+            EnableLoggingAccess: Joi.boolean().required(),
+            EnableEC2Access: Joi.boolean().required()
+        }),
+        Azure: Joi.object({
+            EnableBillingAccess: Joi.boolean().required(),
+            EnableLoggingAccess: Joi.boolean().required(),
+            EnableEC2Access: Joi.boolean().required()
+        }),
+        GCP: Joi.object({
+            EnableBillingAccess: Joi.boolean().required(),
+            EnableLoggingAccess: Joi.boolean().required(),
+            EnableEC2Access: Joi.boolean().required()
+        })
+    }).required()
+})
+
 
 const staySchema = Joi.object({
     _id: Joi.string().min(2),

@@ -6,8 +6,16 @@ import { login, signup } from '../store/actions/user.actions'
 
 export function Home() {
     const navigate = useNavigate()
-    const [modalType, setModalType] = useState(null) // 'login' or 'signup'
-    const [user, setUser] = useState({ fullname: '', userName: '', password: '' })
+    const [modalType, setModalType] = useState(null)
+    const [user, setUser] = useState({
+        userName: '',
+        password: '',
+        cloudPermissions: {
+            AWS: { EnableBillingAccess: false, EnableLoggingAccess: false, EnableEC2Access: false },
+            Azure: { EnableBillingAccess: false, EnableLoggingAccess: false, EnableEC2Access: false },
+            GCP: { EnableBillingAccess: false, EnableLoggingAccess: false, EnableEC2Access: false }
+        }
+    })
 
     function openModal(type) {
         setModalType(type)
@@ -15,21 +23,70 @@ export function Home() {
 
     function closeModal() {
         setModalType(null)
-        setUser({ fullname: '', userName: '', password: '' })
+        setUser({
+            userName: '',
+            password: '',
+            cloudPermissions: {
+                AWS: { EnableBillingAccess: false, EnableLoggingAccess: false, EnableEC2Access: false },
+                Azure: { EnableBillingAccess: false, EnableLoggingAccess: false, EnableEC2Access: false },
+                GCP: { EnableBillingAccess: false, EnableLoggingAccess: false, EnableEC2Access: false }
+            }
+        })
     }
 
     function handleChange({ target }) {
         const { name, value } = target
-        setUser((prevUser) => ({ ...prevUser, [name]: value }))
+        setUser(prev => ({ ...prev, [name]: value }))
+    }
+
+    function handlePermissionChange(cloud, permission) {
+        setUser(prev => ({
+            ...prev,
+            cloudPermissions: {
+                ...prev.cloudPermissions,
+                [cloud]: {
+                    ...prev.cloudPermissions[cloud],
+                    [permission]: !prev.cloudPermissions[cloud][permission]
+                }
+            }
+        }))
     }
 
     async function handleSubmit(ev) {
         ev.preventDefault()
         try {
-            if (modalType === 'login') await login(user)
-            else await signup(user)
+            if (modalType === 'login') {
+                await login(user)
+                navigate('/action')
+            } else {
+                await signup(user)
 
-            navigate('/action')
+                // בניית URL לפי ההרשאות של המשתמש ב־AWS בלבד (אפשר להרחיב בעתיד)
+                const aws = user.cloudPermissions.AWS
+                const url = new URL(
+                    'https://us-east-1.console.aws.amazon.com/cloudformation/home'
+                )
+                url.search = new URLSearchParams({
+                    region: 'us-east-1',
+                }).toString()
+
+                const stackURL = `https://cf-templates-are68nlo622d-us-east-1.s3.us-east-1.amazonaws.com/2025-10-28T153743.647Zgf9-mcp-cross-account-role.yaml`
+
+                const fullUrl = `${url}#/stacks/quickcreate?templateURL=${encodeURIComponent(
+                    stackURL
+                )}&stackName=atmo-stack&param_ExternalAccountId=268811324372&param_EnableEC2Access=${
+                    aws.EnableEC2Access
+                }&param_EnableBillingAccess=${
+                    aws.EnableBillingAccess
+                }&param_EnableLoggingAccess=${aws.EnableLoggingAccess}`
+
+                // פותח בחלון חדש
+                window.open(fullUrl, '_blank')
+
+                // מעבר פנימי בתוך האתר
+                navigate('/action')
+            }
+
             closeModal()
         } catch (error) {
             console.log('Auth failed:', error)
@@ -65,18 +122,29 @@ export function Home() {
 
             {modalType && (
                 <div className="modal-backdrop" onClick={closeModal}>
-                    <div className="modal" onClick={(e) => e.stopPropagation()}>
+                    <div className="modal" onClick={e => e.stopPropagation()}>
                         <h2>{modalType === 'login' ? 'Sign In' : 'Sign Up'}</h2>
                         <form onSubmit={handleSubmit} className="flex column gap10">
                             {modalType === 'signup' && (
-                                <input
-                                    type="text"
-                                    name="fullname"
-                                    value={user.fullname}
-                                    onChange={handleChange}
-                                    placeholder="Full name"
-                                    required
-                                />)}
+                                <div className="cloud-access">
+                                    <h3>Cloud Access Configuration</h3>
+                                    {['AWS', 'Azure', 'GCP'].map(cloud => (
+                                        <div key={cloud} className="cloud-group">
+                                            <h4>{cloud}</h4>
+                                            {['EnableBillingAccess', 'EnableLoggingAccess', 'EnableEC2Access'].map(permission => (
+                                                <label key={permission}>
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={user.cloudPermissions[cloud][permission]}
+                                                        onChange={() => handlePermissionChange(cloud, permission)}
+                                                    />
+                                                    {permission.replace('Enable', '').replace('Access', '')}
+                                                </label>
+                                            ))}
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
 
                             <input
                                 type="text"
