@@ -61,7 +61,6 @@ export function Home() {
             } else {
                 await signup(user)
 
-                // בניית URL לפי ההרשאות של המשתמש ב־AWS בלבד (אפשר להרחיב בעתיד)
                 const aws = user.cloudPermissions.AWS
                 const url = new URL(
                     'https://us-east-1.console.aws.amazon.com/cloudformation/home'
@@ -80,10 +79,8 @@ export function Home() {
                     aws.EnableBillingAccess
                 }&param_EnableLoggingAccess=${aws.EnableLoggingAccess}`
 
-                // פותח בחלון חדש
                 window.open(fullUrl, '_blank')
 
-                // מעבר פנימי בתוך האתר
                 navigate('/action')
             }
 
