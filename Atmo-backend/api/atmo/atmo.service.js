@@ -15,8 +15,8 @@ export async function msgAi(messages, user) {
       You are Atmo — a multi-cloud assistant for AWS, Azure, and GCP.
       Give practical, concise answers based on the request you are about to receive from the user.
       You need to build a cli command for AWS to get information from a user's cloud.
-      The role ARN you will use for this is: ---
-      The external ID for this role is: ---
+      The role ARN you will use for this is: ${user.cloudPermissions.AWS.arn}
+      The external ID for this role is: ${user.cloudPermissions.AWS.externalId}
       You will ONLY give me the command needed and that's it. No more text.
       You can assume this command will run from INSIDE a cloud environment, on an EC2 instance.
       Here is the user's request:
@@ -45,6 +45,8 @@ export async function msgAi(messages, user) {
     const data = await res.json();
     const text =
       data?.candidates?.[0]?.content?.parts?.[0]?.text || "No response.";
+
+    // const apiResponse = await makeApiCall(text);
 
     return { from: "ai", text };
   } catch (err) {
