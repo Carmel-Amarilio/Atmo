@@ -1,5 +1,8 @@
 import fetch from "node-fetch";
 import { exec } from "child_process";
+import { promisify } from "util";
+
+const execAsync = promisify(exec);
 
 const GEMINI_API_KEY = "AIzaSyAjQEq-fZjulJezlvKRiOB67ZkIIQ9jGFM";
 
@@ -8,6 +11,14 @@ export const atmoService = {
 };
 
 export async function msgAi(messages, user) {
+  const res = await getApiCommand(messages, user);
+  const { text } = res;
+  const apiCallRes = await makeApiCall(text);
+  const AiResponse = await getAiFinalMessage(messages, user, apiCallRes);
+  return { from: "ai", AiResponse };
+}
+
+async function getApiCommand(messages, user) {
   try {
     const lastMsg = messages[messages.length - 1].text;
 
@@ -46,8 +57,6 @@ export async function msgAi(messages, user) {
     const text =
       data?.candidates?.[0]?.content?.parts?.[0]?.text || "No response.";
 
-    // const apiResponse = await makeApiCall(text);
-
     return { from: "ai", text };
   } catch (err) {
     console.error("❌ Error communicating with Gemini:", err);
@@ -57,18 +66,69 @@ export async function msgAi(messages, user) {
 
 async function makeApiCall(command) {
   try {
-    exec(command, (error, stdout, stderr) => {
-      if (error) {
-        console.error(`Error: ${error.message}`);
-        return;
-      }
-      if (stderr) {
-        console.error(`stderr: ${stderr}`);
-      }
-      console.log(`Output:\n${stdout}`);
-    });
+    const { stdout, stderr } = await execAsync(command);
+
+    if (stderr) {
+      console.error(`stderr: ${stderr}`);
+    }
+
+    console.log(`Output:\n${stdout}`);
+    return stdout;
   } catch (error) {
-    console.error("Command failed:", error.message);
+    console.error(`Error: ${error.message}`);
     throw error;
+  }
+}
+
+async function getAiFinalMessage(messages, user, apiCallResult) {
+  try {
+    const lastMsg = messages[messages.length - 1].text;
+    const prompt = `
+      You are Atmo, a multi-cloud assistant specializing in AWS, Azure, and GCP.
+
+      ## Context
+      - **User**: ${user?.userName || "Guest"}
+      - **Request**: "${lastMsg}"
+      - **API Response**: ${apiCallResult}
+
+      ## Your Task
+      Provide a clear, helpful explanation of the API response to address the user's request.
+
+      ## Guidelines
+      - Explain technical results in accessible language
+      - Highlight key information relevant to the user's question
+      - If the API call succeeded, summarize what was accomplished
+      - If there were errors, explain what went wrong and suggest next steps
+      - Be concise but complete
+      - Use formatting (bullet points, code blocks) when it improves clarity
+      `;
+
+    const body = {
+      contents: [{ parts: [{ text: prompt }] }],
+    };
+
+    const res = await fetch(
+      "https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=" +
+        GEMINI_API_KEY,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      }
+    );
+
+    if (!res.ok) {
+      const text = await res.text();
+      throw new Error(`Gemini API error: ${res.status} ${text}`);
+    }
+
+    const data = await res.json();
+    const text =
+      data?.candidates?.[0]?.content?.parts?.[0]?.text || "No response.";
+
+    return { from: "ai", text };
+  } catch (err) {
+    console.error("❌ Error communicating with Gemini:", err);
+    return { from: "ai", text: "Sorry, I couldn’t process that right now." };
   }
 }
