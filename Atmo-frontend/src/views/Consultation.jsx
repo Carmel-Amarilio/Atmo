@@ -57,7 +57,7 @@ export function Consultation() {
               {msg.text}
             </div>
           ))}
-        {!isLoading && (
+        {isLoading && (
           <div className='msg ai loading'>
             <img src={loader} alt='loading...' />
           </div>
