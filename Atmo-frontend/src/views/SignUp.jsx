@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { signup } from '../store/actions/user.actions'
 
@@ -15,9 +15,15 @@ export function SignUp() {
         EnableBillingAccess: false,
         EnableLoggingAccess: false,
         EnableEC2Access: false,
-        arn: ''
+        arn: '',
+        externalId: ''
     })
     const [user, setUser] = useState({ userName: '', password: '' })
+
+    useEffect(() => {
+        const randomExternalId = `atmo-${Math.random().toString(36).substring(2, 10)}`
+        setAwsConfig(prev => ({ ...prev, externalId: randomExternalId }))
+    }, [])
 
     function handleUserChange({ target }) {
         const { name, value } = target
@@ -37,9 +43,9 @@ export function SignUp() {
                 GCP: {}
             }
         }
-        try {
-            console.log(finalUser);
 
+        try {
+            console.log('🟣 Final user signup payload:', finalUser)
             await signup(finalUser)
             navigate('/action')
         } catch (err) {
@@ -56,6 +62,7 @@ export function SignUp() {
             templateURL: template,
             stackName: 'atmo-stack',
             param_ExternalAccountId: '268811324372',
+            param_ExternalId: awsConfig.externalId,
             param_EnableEC2Access: awsConfig.EnableEC2Access,
             param_EnableBillingAccess: awsConfig.EnableBillingAccess,
             param_EnableLoggingAccess: awsConfig.EnableLoggingAccess
@@ -79,7 +86,7 @@ export function SignUp() {
 
                 {step === 1 && (
                     <div className="signup-step fade-in">
-                        <h2>Welcome to Atmo ☁️</h2>
+                        <h2>Welcome to Atmo </h2>
                         <p>Create your account to start connecting your clouds.</p>
                         <input
                             type="text"
@@ -139,14 +146,15 @@ export function SignUp() {
                         <div className="toggles">
                             {['EnableBillingAccess', 'EnableLoggingAccess', 'EnableEC2Access'].map(key => (
                                 <label key={key} className="toggle-option">
-                                    <input type="checkbox" checked={awsConfig[key]} onChange={() => handleAwsToggle(key)} />
                                     {key.replace('Enable', '').replace('Access', '')}
+                                    <input type="checkbox" checked={awsConfig[key]} onChange={() => handleAwsToggle(key)} />
                                 </label>
                             ))}
                         </div>
 
+
                         <a href={generateAwsLink()} target="_blank" rel="noreferrer" className="aws-btn">
-                            ⚙️ Open AWS CloudFormation
+                            Open AWS CloudFormation
                         </a>
 
                         <div className="arn-input flex column">

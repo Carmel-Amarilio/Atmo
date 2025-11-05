@@ -2,36 +2,20 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import LogoImg from '../assets/img/Logo1.png'
 import AtmoGraf from '../assets/img/AtmoGraf.png'
-import { login, signup } from '../store/actions/user.actions'
+import { login } from '../store/actions/user.actions'
 
 export function Home() {
     const navigate = useNavigate()
-    const [modalType, setModalType] = useState(null)
-    const [user, setUser] = useState({
-        userName: '',
-        password: '',
-        cloudPermissions: {
-            AWS: { EnableBillingAccess: false, EnableLoggingAccess: false, EnableEC2Access: false },
-            Azure: { EnableBillingAccess: false, EnableLoggingAccess: false, EnableEC2Access: false },
-            GCP: { EnableBillingAccess: false, EnableLoggingAccess: false, EnableEC2Access: false }
-        }
-    })
+    const [isLoginOpen, setIsLoginOpen] = useState(false)
+    const [user, setUser] = useState({ userName: '', password: '' })
 
-    function openModal(type) {
-        setModalType(type)
+    function openLogin() {
+        setIsLoginOpen(true)
     }
 
-    function closeModal() {
-        setModalType(null)
-        setUser({
-            userName: '',
-            password: '',
-            cloudPermissions: {
-                AWS: { EnableBillingAccess: false, EnableLoggingAccess: false, EnableEC2Access: false },
-                Azure: { EnableBillingAccess: false, EnableLoggingAccess: false, EnableEC2Access: false },
-                GCP: { EnableBillingAccess: false, EnableLoggingAccess: false, EnableEC2Access: false }
-            }
-        })
+    function closeLogin() {
+        setIsLoginOpen(false)
+        setUser({ userName: '', password: '' })
     }
 
     function handleChange({ target }) {
@@ -39,54 +23,14 @@ export function Home() {
         setUser(prev => ({ ...prev, [name]: value }))
     }
 
-    function handlePermissionChange(cloud, permission) {
-        setUser(prev => ({
-            ...prev,
-            cloudPermissions: {
-                ...prev.cloudPermissions,
-                [cloud]: {
-                    ...prev.cloudPermissions[cloud],
-                    [permission]: !prev.cloudPermissions[cloud][permission]
-                }
-            }
-        }))
-    }
-
-    async function handleSubmit(ev) {
+    async function handleLogin(ev) {
         ev.preventDefault()
         try {
-            if (modalType === 'login') {
-                await login(user)
-                navigate('/action')
-            } else {
-                await signup(user)
-
-                const aws = user.cloudPermissions.AWS
-                const url = new URL(
-                    'https://us-east-1.console.aws.amazon.com/cloudformation/home'
-                )
-                url.search = new URLSearchParams({
-                    region: 'us-east-1',
-                }).toString()
-
-                const stackURL = `https://cf-templates-are68nlo622d-us-east-1.s3.us-east-1.amazonaws.com/2025-10-28T153743.647Zgf9-mcp-cross-account-role.yaml`
-
-                const fullUrl = `${url}#/stacks/quickcreate?templateURL=${encodeURIComponent(
-                    stackURL
-                )}&stackName=atmo-stack&param_ExternalAccountId=268811324372&param_EnableEC2Access=${
-                    aws.EnableEC2Access
-                }&param_EnableBillingAccess=${
-                    aws.EnableBillingAccess
-                }&param_EnableLoggingAccess=${aws.EnableLoggingAccess}`
-
-                window.open(fullUrl, '_blank')
-
-                navigate('/action')
-            }
-
-            closeModal()
+            await login(user)
+            navigate('/action')
+            closeLogin()
         } catch (error) {
-            console.log('Auth failed:', error)
+            console.log('Login failed:', error)
         }
     }
 
@@ -107,42 +51,21 @@ export function Home() {
                         visualizations, AI enhancements, and actionable recommendations.
                     </p>
                     <div className="btns flex gap20 justify-center">
-                        <button className="sing-up-btn" onClick={() => openModal('signup')}>
+                        <button className="sing-up-btn" onClick={() => navigate('/signup')}>
                             Sign up
                         </button>
-                        <button className="sing-in-btn" onClick={() => openModal('login')}>
+                        <button className="sing-in-btn" onClick={openLogin}>
                             Sign in
                         </button>
                     </div>
                 </div>
             </article>
 
-            {modalType && (
-                <div className="modal-backdrop" onClick={closeModal}>
+            {isLoginOpen && (
+                <div className="modal-backdrop" onClick={closeLogin}>
                     <div className="modal" onClick={e => e.stopPropagation()}>
-                        <h2>{modalType === 'login' ? 'Sign In' : 'Sign Up'}</h2>
-                        <form onSubmit={handleSubmit} className="flex column gap10">
-                            {modalType === 'signup' && (
-                                <div className="cloud-access">
-                                    <h3>Cloud Access Configuration</h3>
-                                    {['AWS', 'Azure', 'GCP'].map(cloud => (
-                                        <div key={cloud} className="cloud-group">
-                                            <h4>{cloud}</h4>
-                                            {['EnableBillingAccess', 'EnableLoggingAccess', 'EnableEC2Access'].map(permission => (
-                                                <label key={permission}>
-                                                    <input
-                                                        type="checkbox"
-                                                        checked={user.cloudPermissions[cloud][permission]}
-                                                        onChange={() => handlePermissionChange(cloud, permission)}
-                                                    />
-                                                    {permission.replace('Enable', '').replace('Access', '')}
-                                                </label>
-                                            ))}
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-
+                        <h2>Sign In</h2>
+                        <form onSubmit={handleLogin} className="flex column gap10">
                             <input
                                 type="text"
                                 name="userName"
@@ -159,11 +82,9 @@ export function Home() {
                                 placeholder="Password"
                                 required
                             />
-                            <button type="submit">
-                                {modalType === 'login' ? 'Sign In' : 'Create Account'}
-                            </button>
+                            <button type="submit">Sign In</button>
                         </form>
-                        <button className="close-btn" onClick={closeModal}>
+                        <button className="close-btn" onClick={closeLogin}>
                             ✕
                         </button>
                     </div>
