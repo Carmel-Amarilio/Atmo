@@ -1,4 +1,5 @@
 import fetch from "node-fetch";
+import { exec } from "child_process";
 
 const GEMINI_API_KEY = "AIzaSyAjQEq-fZjulJezlvKRiOB67ZkIIQ9jGFM";
 
@@ -49,5 +50,23 @@ export async function msgAi(messages, user) {
   } catch (err) {
     console.error("❌ Error communicating with Gemini:", err);
     return { from: "ai", text: "Sorry, I couldn’t process that right now." };
+  }
+}
+
+async function makeApiCall(command) {
+  try {
+    exec(command, (error, stdout, stderr) => {
+      if (error) {
+        console.error(`Error: ${error.message}`);
+        return;
+      }
+      if (stderr) {
+        console.error(`stderr: ${stderr}`);
+      }
+      console.log(`Output:\n${stdout}`);
+    });
+  } catch (error) {
+    console.error("Command failed:", error.message);
+    throw error;
   }
 }
