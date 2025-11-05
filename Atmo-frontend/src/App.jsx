@@ -7,6 +7,7 @@ import { Home } from './views/Home'
 import { store } from './store/store'
 import { AtmoAction } from './views/AtmoAction'
 import { Consultation } from './views/Consultation'
+import { SignUp } from './views/SignUp'
 
 export function App() {
   return (
@@ -15,6 +16,7 @@ export function App() {
         <main >
           <Routes>
             <Route element={<Home />} path="/" />
+            <Route element={<SignUp />} path="/signup" />
             <Route element={<AtmoAction />} path="/action" />
             <Route element={<Consultation />} path="/consultation" />
           </Routes>

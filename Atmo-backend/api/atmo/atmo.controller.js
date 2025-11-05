@@ -8,11 +8,11 @@ export function getHealthyCheck(req, res) {
 }
 
 export async function sendConsultation(req, res) {
+    const { loggedinUser } = req
     try {
         const messages = req.body
-        // console.log(messages);
 
-        const respondsMessages = await atmoService.msgAi(messages)
+        const respondsMessages = await atmoService.msgAi(messages, loggedinUser)
         res.json(respondsMessages)
     } catch (err) {
         logger.error('Failed to get messages', err)

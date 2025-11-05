@@ -37,8 +37,8 @@ async function signup(userName, password, cloudPermissions) {
 }
 
 function getLoginToken(user) {
-    const { _id, fullname, isAdmin, userName } = user
-    const userInfo = { _id, fullname, isAdmin, userName }
+    const { _id, cloudPermissions, userName } = user
+    const userInfo = { _id, cloudPermissions, userName }
     return cryptr.encrypt(JSON.stringify(userInfo))
 }
 

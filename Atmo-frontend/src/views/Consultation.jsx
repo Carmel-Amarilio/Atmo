@@ -14,14 +14,18 @@ export function Consultation() {
 
   function handleSend() {
     if (!input.trim()) return
-    setMessages([...messages, { from: 'user', text: input }])
-    sendConsultation()
+    const newMSG=[...messages, { from: 'user', text: input }]
+    setMessages(newMSG)
+    sendConsultation(newMSG)
     setInput('')
   }
 
-  async function sendConsultation() {
+  async function sendConsultation(newMSG) {
     try {
-      atmoService.sendConsultation(messages)
+      const response  = await atmoService.sendConsultation(newMSG)
+      setMessages(res=>[...res, response])
+      console.log(response );
+      
     } catch (error) {
       console.log('Cannot logout', err)
     }

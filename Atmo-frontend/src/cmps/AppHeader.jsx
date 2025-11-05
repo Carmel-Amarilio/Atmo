@@ -29,7 +29,6 @@ export function AppHeader() {
         setIsMenuOpen(false)
     }
 
-    // יצירת רשימת שירותים לפי ההרשאות
     const cloudOptions = [
         { name: 'All', enabled: true },
         { name: 'AWS', enabled: loggedinUser?.cloudPermissions?.AWS?.EnableEC2Access ||
@@ -45,14 +44,14 @@ export function AppHeader() {
 
     return (
         <header className="app-header flex align-center justify-between">
-            <div className="main-logo flex align-center gap10" onClick={() => navigate('/')}>
+            <div className="main-logo flex align-center gap10" onClick={() => navigate('/action')}>
                 <img src={LogoImg} alt="Atmo Logo" />
                 <h1>Atmo</h1>
             </div>
 
             {loggedinUser && (
                 <div className="user-section">
-                    <div className="user-btn flex gap10" onClick={toggleMenu}>
+                    <div className="user-btn flex  align-center  space-between" onClick={toggleMenu}>
                         <div className="user-icon flex align-center justify-center">
                             {loggedinUser.userName?.[0]?.toUpperCase() || '?'}
                         </div>
