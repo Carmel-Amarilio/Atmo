@@ -36,7 +36,8 @@ const signupSchema = Joi.object({
       EnableBillingAccess: Joi.boolean().default(false),
       EnableLoggingAccess: Joi.boolean().default(false),
       EnableEC2Access: Joi.boolean().default(false),
-      arn: Joi.string().allow('', null)
+      arn: Joi.string().allow('', null),
+      externalId: Joi.string().allow('', null)
     }).default({}),
 
     Azure: Joi.object({
