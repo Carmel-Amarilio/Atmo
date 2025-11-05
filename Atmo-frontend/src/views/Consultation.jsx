@@ -4,6 +4,9 @@ import { useNavigate } from 'react-router-dom';
 import { AppHeader } from '../cmps/AppHeader';
 import { atmoService } from '../services/Atmo.service';
 
+import loader from '../assets/img/loader.gif'
+
+
 export function Consultation() {
 
   const navigate = useNavigate();
@@ -11,21 +14,27 @@ export function Consultation() {
     { from: 'ai', text: 'Hello! Ask any questions you have about your cloud environment.' }
   ])
   const [input, setInput] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
 
-  function handleSend() {
+
+  async function handleSend() {
     if (!input.trim()) return
-    const newMSG=[...messages, { from: 'user', text: input }]
+    const newMSG = [...messages, { from: 'user', text: input }]
     setMessages(newMSG)
-    sendConsultation(newMSG)
+    setIsLoading(true)
+
+    await sendConsultation(newMSG)
+    setIsLoading(false)
+
     setInput('')
   }
 
   async function sendConsultation(newMSG) {
     try {
-      const response  = await atmoService.sendConsultation(newMSG)
-      setMessages(res=>[...res, response])
-      console.log(response );
-      
+      const response = await atmoService.sendConsultation(newMSG)
+      setMessages(res => [...res, response])
+      console.log(response);
+
     } catch (error) {
       console.log('Cannot logout', err)
     }
@@ -48,7 +57,13 @@ export function Consultation() {
               {msg.text}
             </div>
           ))}
+        {!isLoading && (
+          <div className='msg ai loading'>
+            <img src={loader} alt='loading...' />
+          </div>
+        )}
         </div>
+
 
         <div className="input-area flex">
           <input
