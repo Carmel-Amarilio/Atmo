@@ -27,27 +27,34 @@ export const validateOrder = (req, res, next) => {
 }
 
 const signupSchema = Joi.object({
-    userName: Joi.string().min(1).max(20).required(),
-    password: Joi.string().min(1).required(),
-    fullname: Joi.string().min(1).max(30),
-    cloudPermissions: Joi.object({
-        AWS: Joi.object({
-            EnableBillingAccess: Joi.boolean().required(),
-            EnableLoggingAccess: Joi.boolean().required(),
-            EnableEC2Access: Joi.boolean().required()
-        }),
-        Azure: Joi.object({
-            EnableBillingAccess: Joi.boolean().required(),
-            EnableLoggingAccess: Joi.boolean().required(),
-            EnableEC2Access: Joi.boolean().required()
-        }),
-        GCP: Joi.object({
-            EnableBillingAccess: Joi.boolean().required(),
-            EnableLoggingAccess: Joi.boolean().required(),
-            EnableEC2Access: Joi.boolean().required()
-        })
-    }).required()
+  userName: Joi.string().min(1).max(20).required(),
+  password: Joi.string().min(1).required(),
+  fullname: Joi.string().min(1).max(30).allow('', null),
+
+  cloudPermissions: Joi.object({
+    AWS: Joi.object({
+      EnableBillingAccess: Joi.boolean().default(false),
+      EnableLoggingAccess: Joi.boolean().default(false),
+      EnableEC2Access: Joi.boolean().default(false),
+      arn: Joi.string().allow('', null)
+    }).default({}),
+
+    Azure: Joi.object({
+      EnableBillingAccess: Joi.boolean().default(false),
+      EnableLoggingAccess: Joi.boolean().default(false),
+      EnableEC2Access: Joi.boolean().default(false),
+      arn: Joi.string().allow('', null)
+    }).default({}),
+
+    GCP: Joi.object({
+      EnableBillingAccess: Joi.boolean().default(false),
+      EnableLoggingAccess: Joi.boolean().default(false),
+      EnableEC2Access: Joi.boolean().default(false),
+      arn: Joi.string().allow('', null)
+    }).default({})
+  }).default({})
 })
+
 
 
 const staySchema = Joi.object({

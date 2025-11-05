@@ -12,6 +12,8 @@ export function AppHeader() {
 
     useEffect(() => {
         if (!loggedinUser) navigate('/')
+            console.log(loggedinUser);
+            
     }, [loggedinUser, navigate])
 
     function toggleMenu() {
