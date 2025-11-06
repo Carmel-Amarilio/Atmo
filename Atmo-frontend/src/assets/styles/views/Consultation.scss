@@ -34,9 +34,10 @@
         border-radius: 8px;
         max-width: 80%;
         line-height: 1.4;
+        white-space: pre-wrap;
 
         &.ai {
-          background: #f3e8ff; 
+          background: #f3e8ff;
           color: #4a148c;
           align-self: flex-start;
         }
