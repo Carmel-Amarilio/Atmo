@@ -9,6 +9,7 @@ import { AtmoAction } from './views/AtmoAction'
 import { Consultation } from './views/Consultation'
 import { SignUp } from './views/SignUp'
 import { CostSaving } from './views/CostSaving'
+import { LogAnalysis } from './views/LogAnalysi'
 
 export function App() {
   return (
@@ -21,6 +22,7 @@ export function App() {
             <Route element={<AtmoAction />} path="/action" />
             <Route element={<Consultation />} path="/consultation" />
             <Route element={<CostSaving />} path="/costsaving" />
+            <Route element={<LogAnalysis />} path="/loganalysis" />
           </Routes>
         </main>
       </Router >
