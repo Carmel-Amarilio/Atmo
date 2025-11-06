@@ -25,7 +25,7 @@ export async function sendLogAnalysis(req, res) {
     const { loggedinUser } = req
     try {
         const result  = await atmoLogsService.logsAI(loggedinUser)
-        res.json(res)
+        res.json(result)
     } catch (err) {
         logger.error('Failed to get messages', err)
         res.status(500).send({ err: 'Failed to add stay' })
