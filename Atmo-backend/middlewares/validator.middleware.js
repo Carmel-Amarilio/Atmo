@@ -40,18 +40,17 @@ const signupSchema = Joi.object({
       externalId: Joi.string().allow('', null)
     }).default({}),
 
-    Azure: Joi.object({
-      EnableBillingAccess: Joi.boolean().default(false),
-      EnableLoggingAccess: Joi.boolean().default(false),
-      EnableEC2Access: Joi.boolean().default(false),
-      arn: Joi.string().allow('', null)
+    GCP: Joi.object({
+      projectId: Joi.string().allow('', null),
+      projectNumber: Joi.string().allow('', null),
+      serviceAccountKey: Joi.any().allow(null) // JSON קובץ או null
     }).default({}),
 
-    GCP: Joi.object({
-      EnableBillingAccess: Joi.boolean().default(false),
-      EnableLoggingAccess: Joi.boolean().default(false),
-      EnableEC2Access: Joi.boolean().default(false),
-      arn: Joi.string().allow('', null)
+    Azure: Joi.object({
+      applicationId: Joi.string().allow('', null),
+      directoryId: Joi.string().allow('', null),
+      clientSecret: Joi.string().allow('', null),
+      subscriptionId: Joi.string().allow('', null)
     }).default({})
   }).default({})
 })
