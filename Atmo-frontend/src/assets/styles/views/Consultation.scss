@@ -1,5 +1,6 @@
 .consultation {
-    gap: 50px;
+  gap: 50px;
+
   h2 {
     font-size: 2em;
     width: 400px;
@@ -8,25 +9,23 @@
 
   .chat-box {
     width: 800px;
-    height: 400px ;
-    overflow-y: scroll;
-    scrollbar-width: none;       
-  -ms-overflow-style: none;    
-    border: 1px solid #e0e0e0;
-    border-radius: 12px;
-    padding: 16px;
-    background: #fff;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-
+    height: 400px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    min-height: 300px;
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    overflow: hidden;
 
     .messages {
-    //   flex: 1;
-    //   overflow-y: auto;
+      flex: 1; 
+      overflow-y: auto;
       margin-bottom: 12px;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
 
       .msg {
         padding: 10px 14px;
@@ -43,10 +42,11 @@
         }
 
         &.user {
-          background: $prime-clr; 
+          background: $prime-clr;
           color: #fff;
           align-self: flex-end;
         }
+
         &.loading {
           display: flex;
           align-items: center;
@@ -55,7 +55,6 @@
           img {
             height: 40px;
           }
-          
         }
       }
     }
@@ -63,6 +62,7 @@
     .input-area {
       display: flex;
       gap: 10px;
+      margin-top: auto; 
 
       input {
         flex: 1;

@@ -7,7 +7,7 @@ import LogoImg from '../assets/img/Logo1.png'
 export function AppHeader() {
     const loggedinUser = useSelector((storeState) => storeState.userModule.user)
     const [isMenuOpen, setIsMenuOpen] = useState(false)
-    const [cloudService, setCloudService] = useState('All')
+    const [cloudService, setCloudService] = useState('AWS')
     const navigate = useNavigate()
 
     useEffect(() => {

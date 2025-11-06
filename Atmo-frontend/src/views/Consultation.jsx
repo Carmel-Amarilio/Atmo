@@ -22,11 +22,11 @@ export function Consultation() {
     const newMSG = [...messages, { from: 'user', text: input }]
     setMessages(newMSG)
     setIsLoading(true)
+    setInput('')
 
     await sendConsultation(newMSG)
     setIsLoading(false)
 
-    setInput('')
   }
 
   async function sendConsultation(newMSG) {
