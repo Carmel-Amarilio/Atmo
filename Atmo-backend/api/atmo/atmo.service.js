@@ -187,6 +187,8 @@ export const atmoService = {
 };
 
 export async function msgAi(messages, user) {
+  await new Promise(resolve => setTimeout(resolve, 3000));
+
   const text = getResponse(messages);
 
   return { from: "ai", text };
