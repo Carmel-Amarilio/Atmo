@@ -196,39 +196,45 @@ function getResponse(messages) {
   const lastMsg = messages[messages.length - 1].text;
   let response = "";
   if (lastMsg.toLowerCase().includes("pay")) {
-    response = `
-      Based on your AWS billing data, you've spent $1,245.17 on S3 storage over the last 3 months (August through October).
-      To give you some context, that averages out to about $415 per month. The main cost drivers are:
+    response = `Based on your AWS billing data, you've spent $1,245.17 on S3 storage over the last 3 months (August through October).
 
-      Storage volume: You're storing approximately 14.4 TB of data on average
-      API requests: Around 2.3 million GET requests monthly (likely serving files to users)
-      Data transfer: About $28/month in outbound data transfer
+To give you some context, that averages out to about $415 per month. The main cost drivers are:
 
-      Your usage has been fairly consistent, though I noticed a slight uptick in September when storage peaked at 15.2 TB. Overall, these costs align with a moderately data-intensive application—things like user-generated content, backups, or media storage.
-    `;
+  • Storage volume: You're storing approximately 14.4 TB of data on
+    average
+  • API requests: Around 2.3 million GET requests monthly (likely
+    serving files to users)
+  • Data transfer: About $28/month in outbound data transfer
+
+Your usage has been fairly consistent, though I noticed a slight uptick in September when storage peaked at 15.2 TB. Overall, these costs align with a moderately data-intensive application—things like user-generated content, backups, or media storage.`;
   }
   if (lastMsg.toLowerCase().includes("ec2")) {
-    response = `
-      In the us-east-1 region, you're managing 6 EC2 instances at the moment. 
-      Here's the current state: 3 instances are running normally and processing requests (these include 2 t3.medium instances handling your web tier and 1 m5.large for your application backend).
-      2 instances are being created right now—they're going through the launch process and running initial system checks. 
-      1 instance is in the terminating phase, meaning it's shutting down gracefully and will be fully decommissioned in the next 1-2 minutes.
-    `;
+    response = `In the us-east-1 region, you're managing 6 EC2 instances at the moment.
+
+Here's the current state:
+  • 3 instances are running normally and processing requests (these
+    include 2 t3.medium instances handling your web tier and 1
+    m5.large for your application backend)
+  • 2 instances are being created right now—they're going through the
+    launch process and running initial system checks
+  • 1 instance is in the terminating phase, meaning it's shutting down
+    gracefully and will be fully decommissioned in the next 1-2 minutes`;
   }
   if (lastMsg.toLowerCase().includes("log")) {
-    response = `
-      Analysis of logs between 3:30 PM and 4:30 PM shows your request timeouts were caused by database lock contention.
-      Root Cause:
-      A bulk UPDATE operation on the orders table (started at 4:02 PM) locked 47,238 rows for approximately 13 minutes, blocking all concurrent transactions.
-      -------------------------------------------------------------------------------
-      Evidence from CloudWatch:
-      [16:02:34] UPDATE orders SET status='processed' WHERE order_date < '2025-10-01'
-      [16:03:12] Error 1205: Lock wait timeout exceeded (23 blocked queries)
-      [16:04:18] Active connections: 142 | Avg wait time: 78.4s
-      [16:14:52] Transaction committed after 738s | Locks released
-      -------------------------------------------------------------------------------
-      Impact: 156 total lock waits, 312.8 seconds cumulative wait time, resulting in cascading request timeouts for any operation touching the orders table."
-    `;
+    response = `Analysis of logs between 3:30 PM and 4:30 PM shows your request timeouts were caused by database lock contention.
+
+Root Cause:
+A bulk UPDATE operation on the orders table (started at 4:02 PM) locked 47,238 rows for approximately 13 minutes, blocking all concurrent transactions.
+
+-------------------------------------------------------------------------------
+Evidence from CloudWatch:
+[16:02:34] UPDATE orders SET status='processed' WHERE order_date < '2025-10-01'
+[16:03:12] Error 1205: Lock wait timeout exceeded (23 blocked queries)
+[16:04:18] Active connections: 142 | Avg wait time: 78.4s
+[16:14:52] Transaction committed after 738s | Locks released
+-------------------------------------------------------------------------------
+
+Impact: 156 total lock waits, 312.8 seconds cumulative wait time, resulting in cascading request timeouts for any operation touching the orders table.`;
   }
   return response;
 }
