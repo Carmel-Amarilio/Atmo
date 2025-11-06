@@ -197,7 +197,7 @@ export async function msgAi(messages, user) {
 
 // Demo workflow with hardcoded responses
 async function msgAiDemo(messages, user) {
-  await new Promise((resolve) => setTimeout(resolve, 5000));
+  await new Promise((resolve) => setTimeout(resolve, 6000));
 
   const text = getDemoResponse(messages);
 
