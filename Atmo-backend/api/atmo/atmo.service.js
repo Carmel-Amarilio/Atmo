@@ -197,7 +197,7 @@ export async function msgAi(messages, user) {
 
 // Demo workflow with hardcoded responses
 async function msgAiDemo(messages, user) {
-  await new Promise((resolve) => setTimeout(resolve, 3000));
+  await new Promise((resolve) => setTimeout(resolve, 5000));
 
   const text = getDemoResponse(messages);
 
@@ -212,23 +212,26 @@ function getDemoResponse(messages) {
 
 To give you some context, that averages out to about $415 per month. The main cost drivers are:
 
-  • Storage volume: You're storing approximately 14.4 TB of data on
-    average
-  • API requests: Around 2.3 million GET requests monthly (likely
-    serving files to users)
-  • Data transfer: About $28/month in outbound data transfer
+  • S3 Standard Storage: $312/month - your primary storage costs
+  • API Requests: $75/month - charges for GET, PUT, and other S3 operations
+  • Data Transfer Out: $28/month - costs for data leaving AWS
 
-Your usage has been fairly consistent, though I noticed a slight uptick in September when storage peaked at 15.2 TB. Overall, these costs align with a moderately data-intensive application—things like user-generated content, backups, or media storage.`;
+Cost trend: Your S3 spending has been relatively stable, with a slight increase in October ($428) compared to August ($398).
+
+`;
   }
   if (lastMsg.toLowerCase().includes("ec2")) {
     response = `In the us-east-1 region, you're managing 6 EC2 instances at the moment.
 
 Here's the current state:
+
   • 3 instances are running normally and processing requests (these
     include 2 t3.medium instances handling your web tier and 1
     m5.large for your application backend)
+
   • 2 instances are being created right now—they're going through the
     launch process and running initial system checks
+    
   • 1 instance is in the terminating phase, meaning it's shutting down
     gracefully and will be fully decommissioned in the next 1-2 minutes`;
   }
