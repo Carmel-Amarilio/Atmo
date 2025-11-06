@@ -18,6 +18,9 @@ export function AtmoAction() {
     function goToAConsultation() {
         navigate('/consultation');
     }
+    function goToCostSaving() {
+        navigate('/costsaving');
+    }
 
     return (
         <section className='atmo-action flex column align-center '>
@@ -25,7 +28,7 @@ export function AtmoAction() {
             <AppHeader />
 
             <section className='option flex align-center justify-center gap10'>
-                <article className='action-card flex column align-center justify-center gap20'>
+                <article className='action-card flex column align-center justify-center gap20' onClick={goToCostSaving}>
                     <img src={icon1Img} alt="" />
                     <h2>Cost Savings</h2>
                     <p>Get recommendations on how to reduce cloud costs.</p>

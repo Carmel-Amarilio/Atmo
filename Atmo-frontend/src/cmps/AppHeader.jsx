@@ -12,8 +12,7 @@ export function AppHeader() {
 
     useEffect(() => {
         if (!loggedinUser) navigate('/')
-            console.log(loggedinUser);
-            
+        console.log('Logged in user:', loggedinUser)
     }, [loggedinUser, navigate])
 
     function toggleMenu() {
@@ -26,34 +25,54 @@ export function AppHeader() {
     }
 
     function handleOption(option) {
-        if (option.disabled) return
+        if (!option.enabled) return
         setCloudService(option.name)
         setIsMenuOpen(false)
     }
 
     const cloudOptions = [
         { name: 'All', enabled: true },
-        { name: 'AWS', enabled: loggedinUser?.cloudPermissions?.AWS?.EnableEC2Access ||
-            loggedinUser?.cloudPermissions?.AWS?.EnableBillingAccess ||
-            loggedinUser?.cloudPermissions?.AWS?.EnableLoggingAccess },
-        { name: 'Azure', enabled: loggedinUser?.cloudPermissions?.Azure?.EnableEC2Access ||
-            loggedinUser?.cloudPermissions?.Azure?.EnableBillingAccess ||
-            loggedinUser?.cloudPermissions?.Azure?.EnableLoggingAccess },
-        { name: 'GCP', enabled: loggedinUser?.cloudPermissions?.GCP?.EnableEC2Access ||
-            loggedinUser?.cloudPermissions?.GCP?.EnableBillingAccess ||
-            loggedinUser?.cloudPermissions?.GCP?.EnableLoggingAccess }
+
+        {
+            name: 'AWS',
+            enabled:
+                loggedinUser?.cloudPermissions?.AWS?.EnableEC2Access ||
+                loggedinUser?.cloudPermissions?.AWS?.EnableBillingAccess ||
+                loggedinUser?.cloudPermissions?.AWS?.EnableLoggingAccess,
+        },
+
+        {
+            name: 'Azure',
+            enabled:
+                !!loggedinUser?.cloudPermissions?.Azure?.applicationId &&
+                !!loggedinUser?.cloudPermissions?.Azure?.directoryId &&
+                !!loggedinUser?.cloudPermissions?.Azure?.subscriptionId,
+        },
+
+        {
+            name: 'GCP',
+            enabled:
+                !!loggedinUser?.cloudPermissions?.GCP?.projectId &&
+                !!loggedinUser?.cloudPermissions?.GCP?.projectNumber,
+        },
     ]
 
     return (
         <header className="app-header flex align-center justify-between">
-            <div className="main-logo flex align-center gap10" onClick={() => navigate('/action')}>
+            <div
+                className="main-logo flex align-center gap10"
+                onClick={() => navigate('/action')}
+            >
                 <img src={LogoImg} alt="Atmo Logo" />
                 <h1>Atmo</h1>
             </div>
 
             {loggedinUser && (
                 <div className="user-section">
-                    <div className="user-btn flex  align-center  space-between" onClick={toggleMenu}>
+                    <div
+                        className="user-btn flex align-center space-between"
+                        onClick={toggleMenu}
+                    >
                         <div className="user-icon flex align-center justify-center">
                             {loggedinUser.userName?.[0]?.toUpperCase() || '?'}
                         </div>
@@ -74,7 +93,9 @@ export function AppHeader() {
                                     {option.name}
                                 </button>
                             ))}
+
                             <hr />
+
                             <button onClick={onLogout} className="logout-btn">
                                 Log out
                             </button>

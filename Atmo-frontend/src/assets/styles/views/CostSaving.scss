@@ -1,0 +1,135 @@
+.cost-saving {
+  background: #fafbff;
+  min-height: 100vh;
+  padding: 2em 3em;
+
+  .content {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 2.5em;
+
+    h2 {
+      color: $prime-clr;
+      font-size: 2em;
+      font-weight: 700;
+      text-align: left;
+      margin-bottom: 0.3em;
+    }
+
+    // ===== CHART SECTIONS =====
+    .chart-section {
+      background: #fff;
+      border-radius: 1.2em;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+      padding: 1.8em 2em;
+      transition: 0.3s ease;
+      position: relative;
+
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 22px rgba($prime-clr, 0.1);
+      }
+
+      h3 {
+        color: $prime-clr;
+        font-size: 1.2em;
+        margin-bottom: 1em;
+        font-weight: 600;
+      }
+    }
+
+    // ===== RECOMMENDATIONS =====
+    .recommendations {
+      margin-top: 1em;
+
+      h3 {
+        color: $prime-clr;
+        font-size: 1.4em;
+        font-weight: 700;
+        margin-bottom: 1em;
+      }
+
+      .cards-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.5em;
+      }
+
+      .rec-card {
+        background: #fff;
+        border-radius: 1em;
+        padding: 1.5em;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        border: 1px solid rgba($prime-clr, 0.1);
+        transition: 0.3s ease;
+
+        &:hover {
+          transform: translateY(-3px);
+          box-shadow: 0 8px 20px rgba($prime-clr, 0.15);
+        }
+
+        h4 {
+          color: $prime-clr;
+          font-size: 1.1em;
+          font-weight: 600;
+          margin-bottom: 0.5em;
+        }
+
+        p {
+          font-size: 0.95em;
+          color: #444;
+          line-height: 1.5;
+          margin-bottom: 0.8em;
+        }
+
+        .impact {
+          display: inline-block;
+          font-weight: 600;
+          color: #10b981;
+          background: rgba(#10b981, 0.1);
+          padding: 0.4em 0.8em;
+          border-radius: 0.6em;
+          font-size: 0.9em;
+        }
+      }
+    }
+  }
+
+  // ===== LOADING STATE =====
+  &.loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1em;
+
+    img {
+      width: 80px;
+      opacity: 0.8;
+    }
+
+    h3 {
+      color: $prime-clr;
+      font-weight: 600;
+    }
+  }
+
+  // ===== RESPONSIVE =====
+  @media (max-width: 768px) {
+    padding: 1.5em;
+
+    .content {
+      gap: 2em;
+
+      .chart-section {
+        padding: 1.5em;
+      }
+
+      .recommendations .cards-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  }
+}
