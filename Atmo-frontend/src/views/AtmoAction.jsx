@@ -21,6 +21,9 @@ export function AtmoAction() {
     function goToCostSaving() {
         navigate('/costsaving');
     }
+    function goToLogAnalysis() {
+        navigate('/loganalysis');
+    }
 
     return (
         <section className='atmo-action flex column align-center '>
@@ -33,7 +36,7 @@ export function AtmoAction() {
                     <h2>Cost Savings</h2>
                     <p>Get recommendations on how to reduce cloud costs.</p>
                 </article>
-                <article className='action-card flex column align-center justify-center gap20'>
+                <article className='action-card flex column align-center justify-center gap20' onClick={goToLogAnalysis}>
                     <img src={icon2Img} alt="" />
                     <h2>Log Analysis</h2>
                     <p>Gain insights from cloud logs to monitor and troubleshoot.</p>
