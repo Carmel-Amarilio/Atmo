@@ -1,200 +1,210 @@
-// import fetch from "node-fetch";
-// import { exec } from "child_process";
-// import { promisify } from "util";
+import fetch from "node-fetch";
+import { exec } from "child_process";
+import { promisify } from "util";
 
-// const execAsync = promisify(exec);
+const execAsync = promisify(exec);
 
-// const GEMINI_API_KEY = "AIzaSyAjQEq-fZjulJezlvKRiOB67ZkIIQ9jGFM";
+const GEMINI_API_KEY = "AIzaSyAjQEq-fZjulJezlvKRiOB67ZkIIQ9jGFM";
 
-// export const atmoService = {
-//   msgAi,
-// };
+// Helper function to convert chat history to Gemini format
+function convertToGeminiFormat(messages) {
+  return messages.map((msg) => ({
+    role: msg.from === "user" ? "user" : "model",
+    parts: [{ text: msg.text }],
+  }));
+}
 
-// // Helper function to convert chat history to Gemini format
-// function convertToGeminiFormat(messages) {
-//   return messages.map((msg) => ({
-//     role: msg.from === "user" ? "user" : "model",
-//     parts: [{ text: msg.text }],
-//   }));
-// }
+// Real workflow with API calls
+async function msgAiReal(messages, user) {
+  const res = await getApiCommand(messages, user);
+  const { text } = res;
+  console.log("text", text);
 
-// export async function msgAi(messages, user) {
-//   const res = await getApiCommand(messages, user);
-//   const { text } = res;
-//   console.log("text", text);
+  const apiCallRes = await makeApiCall(text);
+  console.log("api", apiCallRes);
 
-//   const apiCallRes = await makeApiCall(text);
-//   console.log("api", apiCallRes);
+  const AiResponse = await getAiFinalMessage(messages, user, apiCallRes);
+  console.log(AiResponse);
+  return AiResponse;
+}
 
-//   const AiResponse = await getAiFinalMessage(messages, user, apiCallRes);
-//   console.log(AiResponse);
-//   return AiResponse;
-// }
+async function getApiCommand(messages, user) {
+  try {
+    const lastMsg = messages[messages.length - 1].text;
 
-// async function getApiCommand(messages, user) {
-//   try {
-//     const lastMsg = messages[messages.length - 1].text;
+    const prompt = `
+      You are Atmo — a multi-cloud assistant for AWS, Azure, and GCP.
 
-//     const prompt = `
-//       You are Atmo — a multi-cloud assistant for AWS, Azure, and GCP.
+      ## Your Task
+      Generate an AWS CLI command to fulfill the user's request.
 
-//       ## Your Task
-//       Generate an AWS CLI command to fulfill the user's request.
+      ## Role Credentials
+      - Role ARN: ${user.cloudPermissions.AWS.arn}
+      - External ID: ${user.cloudPermissions.AWS.externalId}
 
-//       ## Role Credentials
-//       - Role ARN: ${user.cloudPermissions.AWS.arn}
-//       - External ID: ${user.cloudPermissions.AWS.externalId}
+      ## Critical Requirements
+      - Output ONLY the AWS CLI command(s) - no explanations, no markdown, no additional text
+      - If you need to assume a role, use this EXACT format:
+        eval $(aws sts assume-role --role-arn ${
+          user.cloudPermissions.AWS.arn
+        } --role-session-name atmo-session --external-id ${
+      user.cloudPermissions.AWS.externalId
+    } --output json | jq -r '.Credentials | "export AWS_ACCESS_KEY_ID=\\(.AccessKeyId)\\nexport AWS_SECRET_ACCESS_KEY=\\(.SecretAccessKey)\\nexport AWS_SESSION_TOKEN=\\(.SessionToken)"') && [your-aws-command-here]
+      - DO NOT use bash variable assignments like STS_OUTPUT=, AWS_ACCESS_KEY_ID=, etc.
+      - DO NOT use intermediate variables or multi-line bash scripts
+      - Use pipes (|) and command substitution where needed
+      - The command runs on an EC2 instance with jq installed
+      - Use --output json and pipe to jq for data processing when appropriate
 
-//       ## Critical Requirements
-//       - Output ONLY the AWS CLI command(s) - no explanations, no markdown, no additional text
-//       - If you need to assume a role, use this EXACT format:
-//         eval $(aws sts assume-role --role-arn ${
-//           user.cloudPermissions.AWS.arn
-//         } --role-session-name atmo-session --external-id ${
-//       user.cloudPermissions.AWS.externalId
-//     } --output json | jq -r '.Credentials | "export AWS_ACCESS_KEY_ID=\\(.AccessKeyId)\\nexport AWS_SECRET_ACCESS_KEY=\\(.SecretAccessKey)\\nexport AWS_SESSION_TOKEN=\\(.SessionToken)"') && [your-aws-command-here]
-//       - DO NOT use bash variable assignments like STS_OUTPUT=, AWS_ACCESS_KEY_ID=, etc.
-//       - DO NOT use intermediate variables or multi-line bash scripts
-//       - Use pipes (|) and command substitution where needed
-//       - The command runs on an EC2 instance with jq installed
-//       - Use --output json and pipe to jq for data processing when appropriate
+      ## User Request
+      ${user?.userName || "Guest"}: ${lastMsg}
 
-//       ## User Request
-//       ${user?.userName || "Guest"}: ${lastMsg}
+      Command:
+      `;
 
-//       Command:
-//       `;
+    // Build contents array with chat history + new prompt
+    const contents = [
+      ...convertToGeminiFormat(messages.slice(0, -1)), // All previous messages
+      {
+        role: "user",
+        parts: [{ text: prompt }],
+      },
+    ];
 
-//     // Build contents array with chat history + new prompt
-//     const contents = [
-//       ...convertToGeminiFormat(messages.slice(0, -1)), // All previous messages
-//       {
-//         role: "user",
-//         parts: [{ text: prompt }],
-//       },
-//     ];
+    const body = {
+      contents: contents,
+    };
 
-//     const body = {
-//       contents: contents,
-//     };
+    const res = await fetch(
+      "https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=" +
+        GEMINI_API_KEY,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      }
+    );
 
-//     const res = await fetch(
-//       "https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=" +
-//         GEMINI_API_KEY,
-//       {
-//         method: "POST",
-//         headers: { "Content-Type": "application/json" },
-//         body: JSON.stringify(body),
-//       }
-//     );
+    if (!res.ok) {
+      const text = await res.text();
+      throw new Error(`Gemini API error: ${res.status} ${text}`);
+    }
 
-//     if (!res.ok) {
-//       const text = await res.text();
-//       throw new Error(`Gemini API error: ${res.status} ${text}`);
-//     }
+    const data = await res.json();
+    const text =
+      data?.candidates?.[0]?.content?.parts?.[0]?.text || "No response.";
 
-//     const data = await res.json();
-//     const text =
-//       data?.candidates?.[0]?.content?.parts?.[0]?.text || "No response.";
+    return { from: "ai", text };
+  } catch (err) {
+    console.error("❌ Error communicating with Gemini:", err);
+    return { from: "ai", text: "Sorry, I couldn't process that right now." };
+  }
+}
 
-//     return { from: "ai", text };
-//   } catch (err) {
-//     console.error("❌ Error communicating with Gemini:", err);
-//     return { from: "ai", text: "Sorry, I couldn't process that right now." };
-//   }
-// }
+async function makeApiCall(command) {
+  try {
+    const { stdout, stderr } = await execAsync(command);
 
-// async function makeApiCall(command) {
-//   try {
-//     const { stdout, stderr } = await execAsync(command);
+    if (stderr) {
+      console.error(`stderr: ${stderr}`);
+    }
 
-//     if (stderr) {
-//       console.error(`stderr: ${stderr}`);
-//     }
+    console.log(`Output:\n${stdout}`);
+    return stdout;
+  } catch (error) {
+    console.error(`Error: ${error.message}`);
+    throw error;
+  }
+}
 
-//     console.log(`Output:\n${stdout}`);
-//     return stdout;
-//   } catch (error) {
-//     console.error(`Error: ${error.message}`);
-//     throw error;
-//   }
-// }
+async function getAiFinalMessage(messages, user, apiCallResult) {
+  try {
+    const lastMsg = messages[messages.length - 1].text;
+    const prompt = `You are Atmo, a multi-cloud assistant specializing in AWS, Azure, and GCP.
 
-// async function getAiFinalMessage(messages, user, apiCallResult) {
-//   try {
-//     const lastMsg = messages[messages.length - 1].text;
-//     const prompt = `
-//       You are Atmo, a multi-cloud assistant specializing in AWS, Azure, and GCP.
+User Request: "${lastMsg}"
+API Response: ${apiCallResult}
 
-//       ## Context
-//       - **User**: ${user?.userName || "Guest"}
-//       - **Request**: "${lastMsg}"
-//       - **API Response**: ${apiCallResult}
+Provide a clear, concise answer (2-4 sentences maximum) that directly addresses the user's request.
 
-//       ## Your Task
-//       Provide a clear, helpful explanation of the API response to address the user's request.
+Critical formatting rules:
+- Start with the direct answer immediately (no greetings, no "Based on your request")
+- Use bullet points (•) for lists with 2-space indentation
+- When bullet text wraps, indent continuation lines with 4 spaces
+- Keep explanations brief and to the point
+- No suggestions unless there's an error
+- Use blank lines between sections
 
-//       ## Guidelines
-//       - Explain technical results in accessible language
-//       - Highlight key information relevant to the user's question
-//       - If the API call succeeded, summarize what was accomplished
-//       - If there were errors, explain what went wrong and suggest next steps
-//       - Be concise but complete
-//       - Use formatting (bullet points, code blocks) when it improves clarity
-//       `;
+Example format:
+You have 6 EC2 instances in us-east-1.
 
-//     // Build contents array with chat history + new prompt
-//     const contents = [
-//       ...convertToGeminiFormat(messages.slice(0, -1)), // All previous messages
-//       {
-//         role: "user",
-//         parts: [{ text: prompt }],
-//       },
-//     ];
+Current state:
+  • 3 running instances (2 t3.medium, 1 m5.large)
+  • 2 instances being created
+  • 1 instance terminating`;
 
-//     const body = {
-//       contents: contents,
-//     };
+    // Build contents array with chat history + new prompt
+    const contents = [
+      ...convertToGeminiFormat(messages.slice(0, -1)), // All previous messages
+      {
+        role: "user",
+        parts: [{ text: prompt }],
+      },
+    ];
 
-//     const res = await fetch(
-//       "https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=" +
-//         GEMINI_API_KEY,
-//       {
-//         method: "POST",
-//         headers: { "Content-Type": "application/json" },
-//         body: JSON.stringify(body),
-//       }
-//     );
+    const body = {
+      contents: contents,
+    };
 
-//     if (!res.ok) {
-//       const text = await res.text();
-//       throw new Error(`Gemini API error: ${res.status} ${text}`);
-//     }
+    const res = await fetch(
+      "https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=" +
+        GEMINI_API_KEY,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      }
+    );
 
-//     const data = await res.json();
-//     const text =
-//       data?.candidates?.[0]?.content?.parts?.[0]?.text || "No response.";
+    if (!res.ok) {
+      const text = await res.text();
+      throw new Error(`Gemini API error: ${res.status} ${text}`);
+    }
 
-//     return { from: "ai", text };
-//   } catch (err) {
-//     console.error("❌ Error communicating with Gemini:", err);
-//     return { from: "ai", text: "Sorry, I couldn't process that right now." };
-//   }
-// }
+    const data = await res.json();
+    const text =
+      data?.candidates?.[0]?.content?.parts?.[0]?.text || "No response.";
+
+    return { from: "ai", text };
+  } catch (err) {
+    console.error("❌ Error communicating with Gemini:", err);
+    return { from: "ai", text: "Sorry, I couldn't process that right now." };
+  }
+}
 
 export const atmoService = {
   msgAi,
 };
 
+// Main function that routes to demo or real workflow based on username
 export async function msgAi(messages, user) {
-  await new Promise(resolve => setTimeout(resolve, 3000));
+  if (user?.userName.includes("demo")) {
+    return await msgAiDemo(messages, user);
+  } else {
+    return await msgAiReal(messages, user);
+  }
+}
 
-  const text = getResponse(messages);
+// Demo workflow with hardcoded responses
+async function msgAiDemo(messages, user) {
+  await new Promise((resolve) => setTimeout(resolve, 3000));
+
+  const text = getDemoResponse(messages);
 
   return { from: "ai", text };
 }
 
-function getResponse(messages) {
+function getDemoResponse(messages) {
   const lastMsg = messages[messages.length - 1].text;
   let response = "";
   if (lastMsg.toLowerCase().includes("pay")) {
