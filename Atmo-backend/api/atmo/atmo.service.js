@@ -187,12 +187,12 @@ export const atmoService = {
 };
 
 export async function msgAi(messages, user) {
-  const text = getResponse();
+  const text = getResponse(messages);
 
-  return {from: 'ai', text};
+  return { from: "ai", text };
 }
 
-function getResponse() {
+function getResponse(messages) {
   const lastMsg = messages[messages.length - 1].text;
   let response = "";
   if (lastMsg.toLowerCase().includes("pay")) {
@@ -230,4 +230,5 @@ function getResponse() {
       Impact: 156 total lock waits, 312.8 seconds cumulative wait time, resulting in cascading request timeouts for any operation touching the orders table."
     `;
   }
+  return response;
 }
